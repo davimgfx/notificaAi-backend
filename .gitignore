@@ -6,6 +6,14 @@ pom.xml.versionsBackup
 release.properties
 .flattened-pom.xml
 
+/target/
+
+/src/main/resources/application.properties
+/src/main/resources/privateKey.pem
+/src/main/resources/publicKey.pem
+
+*/application.properties
+
 # Eclipse
 .project
 .classpath
