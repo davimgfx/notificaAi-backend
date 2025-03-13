@@ -1,4 +1,4 @@
-package br.notificaai.application.ports.output.entities;
+package br.notificaai.application.ports.output.entity.user;
 
 import java.time.LocalDateTime;
 

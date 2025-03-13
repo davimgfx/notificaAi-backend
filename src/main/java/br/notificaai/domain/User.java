@@ -1,4 +1,4 @@
-package br.notificaai.domain.entity;
+package br.notificaai.domain;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +24,12 @@ public class User {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
 
     public Long getId() {
         return id;
