@@ -5,6 +5,7 @@ import br.notificaai.domain.User;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.nio.file.FileSystemNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -38,5 +39,19 @@ public class PanacheUserRepository implements UserRepositoryPort, PanacheReposit
         persist(user);
 
         return accessToken;
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        PanacheUserEntity entity = find("email", email).firstResult();
+        if (entity == null) {
+            throw new FileSystemNotFoundException("O usuario não foi encontrado.");
+        }
+
+        var user = new User(entity.id, entity.name, entity.email, entity.loginToken, entity.loginTokenExpiration, entity.createdAt, entity.updatedAt);
+
+
+        return user;
+
     }
 }

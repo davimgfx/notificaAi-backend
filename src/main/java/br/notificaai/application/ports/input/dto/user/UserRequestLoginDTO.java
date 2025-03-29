@@ -1,20 +1,31 @@
 package br.notificaai.application.ports.input.dto.user;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class UserRequestLoginDTO {
+
+    @Email
+    @NotBlank(message="Campo email não pode ser vazio")
+    @Size(min = 6, max = 30, message = "Campo email deve ter entre 6 e 30 caracteres")
     private String email;
-    private int accessToken;
+    
+    @NotBlank(message="Campo token não pode ser vazio")
+    @Size(min = 6, max = 6, message = "Campo email deve ter 6 caracteres")
+    private String token;
 
-    public UserRequestLoginDTO(String email, int accessToken) {
+    public UserRequestLoginDTO(String email, String token) {
         this.email = email;
-        this.accessToken = accessToken;
+        this.token = token;
     }
 
-    public int getAccessToken() {
-        return accessToken;
+    public String getToken() {
+        return token;
     }
 
-    public void setAccessToken(int accessToken) {
-        this.accessToken = accessToken;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getEmail() {

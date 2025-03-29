@@ -2,6 +2,9 @@ package br.notificaai.application.ports.input.service.user;
 
 import br.notificaai.application.ports.input.dto.user.UserRequestLoginDTO;
 import br.notificaai.application.ports.input.dto.user.UserRequestRegisterDTO;
+import br.notificaai.application.ports.input.response.UserResponseLoginDTO;
+import br.notificaai.application.ports.input.response.UserResponseTokenDTO;
+import br.notificaai.application.ports.output.repository.token.TokenJwtGeneratorImpl;
 import br.notificaai.application.ports.output.repository.user.UserRepositoryPort;
 import br.notificaai.domain.User;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -13,6 +16,9 @@ import java.util.Random;
 public class UserServiceImpl implements UserServicePort {
 
     private final UserRepositoryPort userRepository;
+
+    @Inject
+    TokenJwtGeneratorImpl token;
 
     @Inject
     public UserServiceImpl(UserRepositoryPort userRepositoryPort) {
@@ -36,7 +42,23 @@ public class UserServiceImpl implements UserServicePort {
     }
 
     @Override
-    public void loginUser(UserRequestLoginDTO user) {
+    public UserResponseLoginDTO loginUser(UserRequestLoginDTO user) {
+        User userAccount = this.userRepository.getUserByEmail(user.getEmail());
 
+        String jwtToken = token.generateJwtToken(userAccount);
+        String refreshToken = token.generateJwtRefreshToken(user.getEmail());
+
+        System.out.println(jwtToken);
+
+        return new UserResponseLoginDTO(jwtToken, refreshToken);
+    }
+
+    @Override
+    public Long validateAccessToken(String refreshToken) {
+
+
+
+
+        return 1L;
     }
 }

@@ -8,16 +8,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HttpResponse {
+public class HttpResponse<T> {
 
     private String message;
     private boolean success;
     private Map<String, String> errors;
+    private T data;
 
     public HttpResponse(String message) {
         this.success = true;
         this.message = message;
         this.errors = null;
+        this.data = null;
     }
 
     public HttpResponse(Set<? extends ConstraintViolation<?>> violations) {
@@ -29,7 +31,17 @@ public class HttpResponse {
                         ConstraintViolation::getMessage,      // Mensagem de erro
                         (msg1, msg2) -> msg1 + ", " + msg2    // Para evitar conflitos se houver múltiplos erros no mesmo campo
                 ));
+        this.data = null;
     }
+
+    // Construtor para dados genéricos (como o token)
+    public HttpResponse(T data) {
+        this.success = true;
+        this.message = null;
+        this.errors = null;
+        this.data = data;
+    }
+
 
     public String getMessage() {
         return message;
@@ -41,6 +53,10 @@ public class HttpResponse {
 
     public Map<String, String> getErrors() {
         return errors;
+    }
+
+    public T getData() {
+        return data;
     }
 
 }

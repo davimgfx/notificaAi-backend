@@ -6,4 +6,5 @@ public interface UserRepositoryPort {
 
     void saveUser(User user);
     Long saveAccessToken(String userEmail, Long accessToken);
+    User getUserByEmail(String email);
 }
