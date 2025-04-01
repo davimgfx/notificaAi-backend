@@ -22,6 +22,24 @@ public class HttpResponse<T> {
         this.data = null;
     }
 
+    // Construtor para dados genéricos (como o token)
+    public HttpResponse(T data) {
+        this.success = true;
+        this.message = null;
+        this.errors = null;
+        this.data = data;
+    }
+
+    // Novo construtor que recebe tanto o data quanto success
+    public HttpResponse(T data, boolean success) {
+        this.success = success;
+        this.message = (String) data;
+        this.errors = null;
+        this.data = null;
+    }
+
+
+
     public HttpResponse(Set<? extends ConstraintViolation<?>> violations) {
         this.success = false;
         this.message = "Erro(s) de validação";
@@ -33,15 +51,6 @@ public class HttpResponse<T> {
                 ));
         this.data = null;
     }
-
-    // Construtor para dados genéricos (como o token)
-    public HttpResponse(T data) {
-        this.success = true;
-        this.message = null;
-        this.errors = null;
-        this.data = data;
-    }
-
 
     public String getMessage() {
         return message;

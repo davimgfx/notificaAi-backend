@@ -53,10 +53,22 @@ public class UserController {
         Set<ConstraintViolation<UserRequestRegisterDTO>> violations = validator.validate(userDTO);
 
         if (violations.isEmpty()) {
-            userServicePort.createUser(userDTO);
-            return Response.status(Response.Status.CREATED)
-                    .entity(new HttpResponse<>("Usuário criado com sucesso"))
-                    .build();
+            try {
+                userServicePort.createUser(userDTO);
+                return Response.status(Response.Status.CREATED)
+                        .entity(new HttpResponse<>("Usuário criado com sucesso"))
+                        .build();
+            } catch (IllegalArgumentException e) {
+                if (e.getMessage().contains("Já existe um usuário com o e-mail fornecido.")) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity(new HttpResponse<>("Já existe um usuário com o e-mail fornecido.", false))
+                            .build();
+                }
+                // Outras exceções podem ser tratadas aqui
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity(new HttpResponse<>("Erro interno ao criar usuário", false))
+                        .build();
+            }
         } else {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new HttpResponse<>(violations))
@@ -106,18 +118,17 @@ public class UserController {
     public Response refreshToken(UserRequestRefreshTokenDTO refreshToken) throws Exception {
         Set<ConstraintViolation<UserRequestRefreshTokenDTO>> violations = validator.validate(refreshToken);
 
-
         String token = refreshToken.getRefreshToken();
+
         String[] parts = token.split("\\."); // Divide o token em 3 partes
 
         String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
 
-        System.out.println("payload: " + payload);
-
 
         if (violations.isEmpty()) {
+            var refreshAndAccessTokens = userServicePort.regenerateAccessToken(payload);
             return Response.status(Response.Status.CREATED)
-                    .entity(new HttpResponse<>("Foi"))
+                    .entity(new HttpResponse<>(refreshAndAccessTokens))
                     .build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST)

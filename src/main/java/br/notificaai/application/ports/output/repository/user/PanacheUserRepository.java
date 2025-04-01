@@ -4,6 +4,7 @@ import br.notificaai.application.ports.output.entity.user.PanacheUserEntity;
 import br.notificaai.domain.User;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.PersistenceException;
 
 import java.nio.file.FileSystemNotFoundException;
 import java.time.LocalDateTime;
@@ -19,7 +20,11 @@ public class PanacheUserRepository implements UserRepositoryPort, PanacheReposit
         entity.name = user.getName();
         entity.email = user.getEmail();
 
-        persist(entity);
+        try{
+            persist(entity);
+        } catch(PersistenceException e){
+            throw new IllegalArgumentException("Já existe um usuário com o e-mail fornecido.");
+        }
     }
 
     @Override
@@ -32,7 +37,6 @@ public class PanacheUserRepository implements UserRepositoryPort, PanacheReposit
         }
 
         PanacheUserEntity user = existingUser.get();
-
 
         user.loginToken = accessToken;
 

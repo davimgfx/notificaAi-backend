@@ -3,7 +3,6 @@ package br.notificaai.application.ports.input.service.user;
 import br.notificaai.application.ports.input.dto.user.UserRequestLoginDTO;
 import br.notificaai.application.ports.input.dto.user.UserRequestRegisterDTO;
 import br.notificaai.application.ports.input.response.UserResponseLoginDTO;
-import br.notificaai.application.ports.input.response.UserResponseTokenDTO;
 import br.notificaai.application.ports.output.repository.token.TokenJwtGeneratorImpl;
 import br.notificaai.application.ports.output.repository.user.UserRepositoryPort;
 import br.notificaai.domain.User;
@@ -19,7 +18,7 @@ public class UserServiceImpl implements UserServicePort {
 
     @Inject
     TokenJwtGeneratorImpl token;
-
+    
     @Inject
     public UserServiceImpl(UserRepositoryPort userRepositoryPort) {
         this.userRepository = userRepositoryPort;
@@ -54,11 +53,40 @@ public class UserServiceImpl implements UserServicePort {
     }
 
     @Override
-    public Long validateAccessToken(String refreshToken) {
+    public UserResponseLoginDTO regenerateAccessToken(String payload) {
+        String email = extractValue(payload, "email");
+        String expiration = extractValue(payload, "exp");
 
+        User userAccount = this.userRepository.getUserByEmail(email);
 
+        String jwtToken = token.generateJwtToken(userAccount);
+        String refreshToken = token.generateJwtRefreshToken(email);
 
-
-        return 1L;
+        return new UserResponseLoginDTO(jwtToken, refreshToken);
     }
+
+
+    private static String extractValue(String json, String key) {
+        // Encontrar a posição da chave no JSON
+        int keyIndex = json.indexOf(key);
+        if (keyIndex == -1) {
+            return "-1"; // Caso a chave não exista
+        }
+
+        // Encontrar a posição do valor (após o sinal de dois pontos)
+        int valueStart = json.indexOf(":", keyIndex) + 1;
+        int valueEnd = json.indexOf(",", valueStart);
+        if (valueEnd == -1) {
+            valueEnd = json.indexOf("}", valueStart); // Caso seja o último valor
+        }
+
+        // Extrair e retornar o valor
+        String value = json.substring(valueStart, valueEnd).trim();
+        if (key.equals("exp")) {
+            return value;
+        }
+
+        return value.replace("\"", "");
+    }
+
 }
